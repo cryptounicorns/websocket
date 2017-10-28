@@ -1,6 +1,8 @@
 websocket
 ---------
 
+[![Build Status](https://travis-ci.org/cryptounicorns/websocket.svg?branch=master)](https://travis-ci.org/cryptounicorns/websocket)
+
 This is a work-in-progress experiment on websocket library implementation for golang.
 
 It is intended to be as high-level as possible to provide a user useful abstractions
