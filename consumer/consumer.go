@@ -26,7 +26,9 @@ func (c *Consumer) consumeLoop() {
 
 	for {
 		buf, err = ioutil.ReadAll(c.reader)
-
+		// FIXME: Send me an empty buffer and I will
+		// return you EOF. You can't know where was a
+		// network connection reset.
 		if err == nil && len(buf) == 0 {
 			err = io.EOF
 		}
