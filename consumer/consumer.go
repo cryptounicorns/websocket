@@ -3,20 +3,16 @@ package consumer
 import (
 	"io"
 	"io/ioutil"
-
-	"github.com/corpix/loggers"
-	"github.com/corpix/loggers/logger/prefixwrapper"
 )
 
 type Consumer struct {
 	reader io.Reader
-	log    loggers.Logger
 
-	messages chan []byte
+	messages chan Result
 	done     chan struct{}
 }
 
-func (c *Consumer) Consume() <-chan []byte {
+func (c *Consumer) Consume() <-chan Result {
 	go c.consumeLoop()
 
 	return c.messages
@@ -24,46 +20,44 @@ func (c *Consumer) Consume() <-chan []byte {
 
 func (c *Consumer) consumeLoop() {
 	var (
-		l = prefixwrapper.New(
-			"consumerLoop: ",
-			c.log,
-		)
-
 		buf []byte
 		err error
 	)
 
 	for {
 		buf, err = ioutil.ReadAll(c.reader)
-		if err != nil {
-			l.Error(err)
-			continue
+
+		if err == nil && len(buf) == 0 {
+			err = io.EOF
 		}
 
 		select {
 		case <-c.done:
 			return
 		default:
-			c.messages <- buf
+			c.messages <- Result{
+				Value: buf,
+				Err:   err,
+			}
+			if err != nil {
+				return
+			}
 		}
 	}
 }
 
 func (c *Consumer) Close() error {
 	close(c.done)
-	close(c.messages)
+	// Not closing, it will be GC'ed.
+	// close(c.messages)
 
 	return nil
 }
 
-func New(r io.Reader, l loggers.Logger) *Consumer {
+func New(r io.Reader) *Consumer {
 	return &Consumer{
-		reader: r,
-		log: prefixwrapper.New(
-			"Consumer: ",
-			l,
-		),
-		messages: make(chan []byte),
+		reader:   r,
+		messages: make(chan Result),
 		done:     make(chan struct{}),
 	}
 }

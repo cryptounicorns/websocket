@@ -7,9 +7,9 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/cryptounicorns/websocket/examples/server/message"
 	"github.com/corpix/loggers"
 	"github.com/corpix/loggers/logger/prefixwrapper"
+	"github.com/cryptounicorns/websocket/examples/server/message"
 )
 
 type Handler struct {

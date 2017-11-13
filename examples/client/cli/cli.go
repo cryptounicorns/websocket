@@ -4,7 +4,6 @@ import (
 	"context"
 	"flag"
 	"io"
-	"net/http"
 
 	"github.com/corpix/loggers"
 	"github.com/corpix/loggers/logger/logrus"
@@ -61,29 +60,25 @@ func Run() error {
 		l = newLogger()
 
 		r          io.ReadCloser
-		res        ws.Response
 		messages   *consumer.Consumer
 		messageNum uint
 		err        error
 	)
 
-	r, res, err = ws.DefaultDialer.Dial(
+	r, _, _, err = ws.DefaultDialer.Dial(
 		context.Background(),
 		Addr,
-		http.Header{},
 	)
 	if err != nil {
 		return err
 	}
 	defer r.Close()
-	defer res.Body.Close()
 
 	messages = consumer.New(
 		wsutil.NewReader(
 			r,
 			ws.StateClientSide,
 		),
-		l,
 	)
 	defer messages.Close()
 
@@ -92,6 +87,10 @@ func Run() error {
 			"message=%s",
 			m,
 		)
+
+		if m.Err != nil {
+			return m.Err
+		}
 
 		if Limit > 0 {
 			messageNum++
