@@ -1,13 +1,13 @@
 hash: 75375e2cfc05b124a99a8e61dddf07e5fee6edbcd8de749f492f9af09a43cdb3
-updated: 2017-10-28T17:58:56.981268891Z
+updated: 2017-11-13T05:26:06.10613219Z
 imports:
 - name: github.com/corpix/loggers
-  version: d5c1e84397f24c1cde4386e0cc158f2dbc49e54f
+  version: f9482b50a1fbacb085cb1351dec51dbf0b1b05f0
   subpackages:
   - logger/logrus
   - logger/prefixwrapper
 - name: github.com/davecgh/go-spew
-  version: 04cdfd42973bb9c8589fd6a731800cf222fde1a9
+  version: ecdeabc65495df2dec95d7c4a4c3e021903035e5
   subpackages:
   - spew
 - name: github.com/gobwas/httphead
@@ -18,17 +18,17 @@ imports:
   - pbufio
   - pbytes
 - name: github.com/gobwas/ws
-  version: 68d2472c0bfbbd6f11ba77bf2c122fbf035c246b
+  version: 915eed3240022c5265584c55032ef1b8c8f84168
   subpackages:
   - wsutil
 - name: github.com/gorilla/context
   version: 08b5f424b9271eedf6f9f0ce86cb9396ed337a42
 - name: github.com/gorilla/mux
-  version: 7625a85c14e615274a4ee4bc8654f72310a563e4
+  version: 2d5fef06b891c971b14aa6f71ca5ab6c03a36e0e
 - name: github.com/sirupsen/logrus
   version: 7f976d3a76720c4c27af2ba716b85d2e0a7e38b1
 - name: golang.org/x/sys
-  version: 661970f62f5897bc0cd5fdca7e087ba8a98a8fa1
+  version: 1e2299c37cc91a509f1b12369872d27be0ce98a6
   subpackages:
   - unix
 testImports:
