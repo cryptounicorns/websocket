@@ -6,18 +6,24 @@ import (
 	"github.com/gobwas/ws/wsutil"
 )
 
-func NewServerBinary(w io.Writer) io.Writer {
-	return New(w, wsutil.WriteServerBinary)
+func wrapWsutil(f func(io.Writer, []byte) error) func(io.WriteCloser, []byte) error {
+	return func(w io.WriteCloser, buf []byte) error {
+		return f(w, buf)
+	}
 }
 
-func NewServerText(w io.Writer) io.Writer {
-	return New(w, wsutil.WriteServerText)
+func NewServerBinary(w io.WriteCloser) io.WriteCloser {
+	return New(w, wrapWsutil(wsutil.WriteServerBinary))
 }
 
-func NewClientBinary(w io.Writer) io.Writer {
-	return New(w, wsutil.WriteClientBinary)
+func NewServerText(w io.WriteCloser) io.WriteCloser {
+	return New(w, wrapWsutil(wsutil.WriteServerText))
 }
 
-func NewClientText(w io.Writer) io.Writer {
-	return New(w, wsutil.WriteClientText)
+func NewClientBinary(w io.WriteCloser) io.WriteCloser {
+	return New(w, wrapWsutil(wsutil.WriteClientBinary))
+}
+
+func NewClientText(w io.WriteCloser) io.WriteCloser {
+	return New(w, wrapWsutil(wsutil.WriteClientText))
 }

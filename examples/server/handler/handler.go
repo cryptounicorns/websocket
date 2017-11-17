@@ -16,7 +16,7 @@ type Handler struct {
 	log loggers.Logger
 }
 
-func (h *Handler) ServeWebsocket(w io.Writer, r *http.Request) {
+func (h *Handler) ServeWebsocket(w io.WriteCloser, r *http.Request) {
 	var (
 		m   []byte
 		err error

@@ -4,10 +4,10 @@ import (
 	"io"
 )
 
-type WriteWith func(w io.Writer, buf []byte) error
+type WriteWith = func(w io.WriteCloser, buf []byte) error
 
 type Writer struct {
-	writer    io.Writer
+	io.WriteCloser
 	writeWith WriteWith
 }
 
@@ -17,7 +17,7 @@ func (w *Writer) Write(m []byte) (int, error) {
 	)
 
 	err = w.writeWith(
-		w.writer,
+		w.WriteCloser,
 		m,
 	)
 	if err != nil {
@@ -27,9 +27,9 @@ func (w *Writer) Write(m []byte) (int, error) {
 	return len(m), nil
 }
 
-func New(w io.Writer, ww WriteWith) *Writer {
+func New(w io.WriteCloser, ww WriteWith) *Writer {
 	return &Writer{
-		writer:    w,
-		writeWith: ww,
+		WriteCloser: w,
+		writeWith:   ww,
 	}
 }

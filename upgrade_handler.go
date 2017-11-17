@@ -23,7 +23,7 @@ type UpgradeHandler struct {
 }
 
 func (h *UpgradeHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	defer r.Body.Close()
+	r.Body.Close()
 
 	var (
 		c   io.WriteCloser
@@ -39,7 +39,6 @@ func (h *UpgradeHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		h.log.Error(err)
 		return
 	}
-	defer c.Close()
 
 	h.ServeWebsocket(c, r)
 }

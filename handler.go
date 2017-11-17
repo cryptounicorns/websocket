@@ -6,5 +6,5 @@ import (
 )
 
 type Handler interface {
-	ServeWebsocket(w io.Writer, r *http.Request)
+	ServeWebsocket(w io.WriteCloser, r *http.Request)
 }
