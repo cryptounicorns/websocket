@@ -21,7 +21,7 @@ type HTTPUpgradeHandler struct {
 	log loggers.Logger
 }
 
-func (h *HTTPUpgradeHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (h *HTTPUpgradeHandler) ServeHTTP(rwc http.ResponseWriter, r *http.Request) {
 	r.Body.Close()
 
 	var (
@@ -29,13 +29,20 @@ func (h *HTTPUpgradeHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		err error
 	)
 
-	c, err = websocket.Upgrade(w, r, DefaultHeaders, 1024, 1024)
+	c, err = websocket.Upgrade(rwc, r, DefaultHeaders, 1024, 1024)
 	if err != nil {
 		h.log.Error(err)
 		return
 	}
 
-	h.ServeWebsocket(&Writer{c}, r)
+	h.ServeWebsocket(
+		NewReadWriteCloser(
+			NewReader(c),
+			NewWriter(c),
+			c,
+		),
+		r,
+	)
 }
 
 func NewHTTPUpgradeHandler(h Handler, l loggers.Logger) *HTTPUpgradeHandler {
