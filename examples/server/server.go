@@ -2,14 +2,13 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
-	"net"
 	"net/http"
 
 	"github.com/corpix/loggers"
 	"github.com/corpix/loggers/logger/logrus"
 	"github.com/corpix/loggers/logger/prefixwrapper"
-	"github.com/gobwas/ws/wsutil"
 	"github.com/gorilla/mux"
 	logrusLogger "github.com/sirupsen/logrus"
 
@@ -46,10 +45,14 @@ func Mount(r *mux.Router, l loggers.Logger) {
 				}
 				n++
 
-				err = wsutil.WriteServerBinary(w, m)
+				_, err = w.Write(m)
 				if err != nil {
-					switch err.(type) {
-					case *net.OpError:
+					// XXX: Because gorilla's error is private we can't
+					// type assert. But we can apply this "hack" to obtain type name
+					// still better than strings.HasPrefix and others in my opinion.
+					switch fmt.Sprintf("%T", err) {
+					case "*net.OpError":
+					case "*websocket.netError":
 					default:
 						l.Error(err)
 					}

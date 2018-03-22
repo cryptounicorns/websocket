@@ -1,12 +1,11 @@
 package websocket
 
 import (
-	"io"
 	"net/http"
 
 	"github.com/corpix/loggers"
 	"github.com/corpix/loggers/logger/prefixwrapper"
-	"github.com/gobwas/ws"
+	"github.com/gorilla/websocket"
 )
 
 var (
@@ -26,21 +25,17 @@ func (h *HTTPUpgradeHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	r.Body.Close()
 
 	var (
-		c   io.WriteCloser
+		c   *websocket.Conn
 		err error
 	)
 
-	c, _, _, err = ws.UpgradeHTTP(
-		r,
-		w,
-		DefaultHeaders,
-	)
+	c, err = websocket.Upgrade(w, r, DefaultHeaders, 1024, 1024)
 	if err != nil {
 		h.log.Error(err)
 		return
 	}
 
-	h.ServeWebsocket(c, r)
+	h.ServeWebsocket(&Writer{c}, r)
 }
 
 func NewHTTPUpgradeHandler(h Handler, l loggers.Logger) *HTTPUpgradeHandler {
