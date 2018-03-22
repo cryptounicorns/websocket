@@ -13,16 +13,16 @@ var (
 	DefaultHeaders = http.Header{}
 )
 
-// UpgradeHandler is a net/http.Handler which is responsible
+// HTTPUpgradeHandler is a net/http.Handler which is responsible
 // for incomming HTTP request upgrade process and handling the
 // upgraded request with some Handler which works only with
 // websockets.
-type UpgradeHandler struct {
+type HTTPUpgradeHandler struct {
 	Handler
 	log loggers.Logger
 }
 
-func (h *UpgradeHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (h *HTTPUpgradeHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	r.Body.Close()
 
 	var (
@@ -43,11 +43,11 @@ func (h *UpgradeHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	h.ServeWebsocket(c, r)
 }
 
-func NewUpgradeHandler(h Handler, l loggers.Logger) *UpgradeHandler {
-	return &UpgradeHandler{
+func NewHTTPUpgradeHandler(h Handler, l loggers.Logger) *HTTPUpgradeHandler {
+	return &HTTPUpgradeHandler{
 		Handler: h,
 		log: prefixwrapper.New(
-			"UpgradeHandler: ",
+			"HTTPUpgradeHandler: ",
 			l,
 		),
 	}
