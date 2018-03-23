@@ -9,8 +9,8 @@ import (
 
 type Reader struct {
 	*websocket.Conn
-	unread []byte
-	lock   *sync.Mutex
+	current io.Reader
+	lock    *sync.Mutex
 }
 
 func (w *Reader) Read(buf []byte) (int, error) {
@@ -19,40 +19,36 @@ func (w *Reader) Read(buf []byte) (int, error) {
 
 	var (
 		t   int
-		b   []byte
+		r   io.Reader
 		n   int
 		err error
 	)
 
-	if len(w.unread) > 0 {
-		b = w.unread
-	} else {
-		for {
-			t, b, err = w.Conn.ReadMessage()
-			if err != nil {
-				return len(b), err
-			}
-			switch t {
-			case websocket.TextMessage:
-			case websocket.BinaryMessage:
-			default:
-				// XXX: Unsupported message
-				continue
-			}
+	if w.current != nil {
+		goto read
+	}
 
-			break
+	for {
+		t, r, err = w.Conn.NextReader()
+		if err != nil {
+			return 0, err
 		}
+		switch t {
+		case websocket.TextMessage:
+		case websocket.BinaryMessage:
+		default:
+			// XXX: Unsupported message
+			continue
+		}
+
+		break
 	}
 
-	n = copy(buf, b)
-	if n < len(b) {
-		w.unread = b[n:]
-	} else {
-		w.unread = nil
-	}
-
-	if len(w.unread) == 0 {
-		err = io.EOF
+	w.current = r
+read:
+	n, err = w.current.Read(buf)
+	if err == io.EOF {
+		w.current = nil
 	}
 
 	return n, err
